@@ -1,9 +1,5 @@
 using System.Collections;
-using System.Collections.Generic;
-using Unity.IO.LowLevel.Unsafe;
-using Unity.VisualScripting;
 using UnityEngine;
-using static UnityEditorInternal.VersionControl.ListControl;
 
 public class PlayerController : MonoBehaviour
 {
@@ -32,24 +28,38 @@ public class PlayerController : MonoBehaviour
     int curHashArm;
 
     int idleHashBody = Animator.StringToHash("Idle-Body");
-    int runHashBody = Animator.StringToHash("Run-Body");
+
+    int runStartHashBody = Animator.StringToHash("RunStart-Body");
+    int runEndHashBody = Animator.StringToHash("RunEnd-Body");
+
     int jumpHashBody = Animator.StringToHash("Jump-Body");
+
     int fallHashBody = Animator.StringToHash("Fall-Body");
 
+
     int climbWallIdleHashBody = Animator.StringToHash("ClimbWallIdle-Body");
+
     int climbWallHashBody = Animator.StringToHash("ClimbWall-Body");
+
     int wallSlideHashBody = Animator.StringToHash("WallSlide-Body");
 
     int hitHashBody = Animator.StringToHash("Hit-Body");
     //=========================================================
     //=========================================================
     int idleHashArm = Animator.StringToHash("Idle-Arm");
-    int runHashArm = Animator.StringToHash("Run-Arm");
+
+    int runStartHashArm = Animator.StringToHash("RunStart-Arm");
+    int runEndHashArm = Animator.StringToHash("RunEnd-Arm");
+
     int jumpHashArm = Animator.StringToHash("Jump-Arm");
+
     int fallHashArm = Animator.StringToHash("Fall-Arm");
 
+
     int climbWallIdleHashArm = Animator.StringToHash("ClimbWallIdle-Arm");
+
     int climbWallHashArm = Animator.StringToHash("ClimbWall-Arm");
+
     int wallSlideHashArm = Animator.StringToHash("WallSlide-Arm");
 
     int hitHashArm = Animator.StringToHash("Hit-Arm");
@@ -59,13 +69,13 @@ public class PlayerController : MonoBehaviour
     {
         #region State
         states[(int)PlayerState.Idle] = new IdleState(this);
-        states[(int)PlayerState.Run] =  new RunState(this);
+        states[(int)PlayerState.Run] = new RunState(this);
         states[(int)PlayerState.Jump] = new JumpState(this);
         states[(int)PlayerState.Fall] = new FallState(this);
 
         states[(int)PlayerState.ClimbWallIdle] = new ClimbWallIdleState(this);
-        states[(int)PlayerState.ClimbWall] =     new ClimbWallState(this);
-        states[(int)PlayerState.WallSlide] =     new WallSlideState(this);
+        states[(int)PlayerState.ClimbWall] = new ClimbWallState(this);
+        states[(int)PlayerState.WallSlide] = new WallSlideState(this);
 
         states[(int)PlayerState.Hit] = new HitState(this);
         #endregion
@@ -202,8 +212,8 @@ public class PlayerController : MonoBehaviour
 
         public override void Enter()
         {
-            player.animator[0].Play(player.runHashBody);
-            player.animator[1].Play(player.runHashArm);
+            player.animator[0].Play(player.runStartHashBody);
+            player.animator[1].Play(player.runStartHashArm);
         }
 
         public override void Update()
@@ -220,21 +230,22 @@ public class PlayerController : MonoBehaviour
 
             if (x < 0)
             {
-                
                 player.render[0].flipX = true;
                 player.render[1].flipX = true;
+                player.render[1].transform.position = new Vector3(player.transform.position.x + 0.4f, player.transform.position.y + 1.2f, player.transform.position.z);
             }
             else if (x > 0)
             {
-                
                 player.render[0].flipX = false;
                 player.render[1].flipX = false;
+                player.render[1].transform.position = new Vector3(player.transform.position.x - 0.4f, player.transform.position.y + 1.2f, player.transform.position.z);
             }
 
             // State 전환
             if (player.isGrounded)
             {
-                if (x == 0) { player.ChangeState(PlayerState.Idle); }
+                if (x == 0)
+                { player.ChangeState(PlayerState.Idle); }
                 else if (Input.GetKeyDown(KeyCode.Space)) { player.ChangeState(PlayerState.Jump); }
             }
             else
@@ -268,12 +279,14 @@ public class PlayerController : MonoBehaviour
             {
                 player.render[0].flipX = false;
                 player.render[1].flipX = false;
+                player.render[1].transform.position = new Vector3(player.transform.position.x - 0.4f, player.transform.position.y + 1.2f, player.transform.position.z);
                 player.rigid.velocity = new Vector2(player.movePower, player.rigid.velocity.y);
             }
             else if (x < 0)
             {
                 player.render[0].flipX = true;
                 player.render[1].flipX = true;
+                player.render[1].transform.position = new Vector3(player.transform.position.x + 0.4f, player.transform.position.y + 1.2f, player.transform.position.z);
                 player.rigid.velocity = new Vector2(-player.movePower, player.rigid.velocity.y);
             }
 
@@ -302,12 +315,14 @@ public class PlayerController : MonoBehaviour
             {
                 player.render[0].flipX = false;
                 player.render[1].flipX = false;
+                player.render[1].transform.position = new Vector3(player.transform.position.x - 0.4f, player.transform.position.y + 1.2f, player.transform.position.z);
                 player.rigid.velocity = new Vector2(player.movePower, player.rigid.velocity.y);
             }
             else if (x < 0)
             {
                 player.render[0].flipX = true;
                 player.render[1].flipX = true;
+                player.render[1].transform.position = new Vector3(player.transform.position.x + 0.4f, player.transform.position.y + 1.2f, player.transform.position.z);
                 player.rigid.velocity = new Vector2(-player.movePower, player.rigid.velocity.y);
             }
 
@@ -336,7 +351,7 @@ public class PlayerController : MonoBehaviour
             // State 전환
             if (Input.GetKeyDown(KeyCode.S) || Input.GetKeyDown(KeyCode.W) ||
                 Input.GetKeyDown(KeyCode.A) || Input.GetKeyDown(KeyCode.D))
-                                                      { player.ChangeState(PlayerState.ClimbWall); }
+            { player.ChangeState(PlayerState.ClimbWall); }
             else if (Input.GetKeyDown(KeyCode.Space)) { player.ChangeState(PlayerState.Jump); }
         }
 
@@ -365,12 +380,14 @@ public class PlayerController : MonoBehaviour
             {
                 player.render[0].flipX = false;
                 player.render[1].flipX = false;
+                player.render[1].transform.position = new Vector3(player.transform.position.x - 0.4f, player.transform.position.y + 1.2f, player.transform.position.z);
                 player.rigid.velocity = new Vector2(player.movePower, player.rigid.velocity.y);
             }
             else if (x < 0)
             {
                 player.render[0].flipX = true;
                 player.render[1].flipX = true;
+                player.render[1].transform.position = new Vector3(player.transform.position.x + 0.4f, player.transform.position.y + 1.2f, player.transform.position.z);
                 player.rigid.velocity = new Vector2(-player.movePower, player.rigid.velocity.y);
             }
             else { player.rigid.velocity = new Vector2(0, player.rigid.velocity.y); }
@@ -433,14 +450,8 @@ public class PlayerController : MonoBehaviour
 
         public override void Exit() { }
     }
-    
+
     //====================================================================================================================
     //====================================================================================================================
-    // 미진행상태
-    // 1. 벽슬라이드
-    // 2. 팔 좌우반전 시 좌우반전만 되고 위치값은 바뀌지 않는 버그
-    // 3. 속도가 너무 빠름
-    // 4. 애니메이션 삽입
-    // 5. 나머지치고 존
 }
 

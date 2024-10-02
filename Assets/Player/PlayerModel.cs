@@ -1,11 +1,8 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
-using static UnityEditor.Progress;
 
 public class PlayerModel : MonoBehaviour
 {
-    [SerializeField] PlayerState curState; 
+    [SerializeField] PlayerState curState;
     public PlayerState CurState { get { return curState; } set { curState = value; } }
 
 
